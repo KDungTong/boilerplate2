@@ -33,13 +33,37 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
+
+  app.route('/login').post(passport.authenticate('local', { failureRedirect: '/' }), (req, res) => {
+    res.redirect('/profile');
+  })
+
+  app.route('/profile').get(ensureAuthenticated, (req,res) => {
+    res.render('profile');
+  })
+
+  //Create a new midddleware
+  function ensureAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.redirect('/');
+};
+
+app
+ .route('/profile')
+ .get(ensureAuthenticated, (req,res) => {
+    res.render('profile');
+ });
+ 
 myDB(async client => {
   const myDataBase = await client.db('database').collection('users');
 
   app.route('/').get((req, res) => {
     res.render('index', {
       title: 'Connected to Database',
-      message: 'Please log in'
+      message: 'Please log in',
+      showLogin: true
     });
   });
 
@@ -59,6 +83,7 @@ myDB(async client => {
   });
 });
 
+
 passport.use(new LocalStrategy((username, password, done) => {
   myDataBase.findOne({ username: username }, (err, user) => {
     console.log(`User ${username} attempted to log in.`);
@@ -68,6 +93,13 @@ passport.use(new LocalStrategy((username, password, done) => {
     return done(null, user);
   });
 }));
+
+function ensureAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.redirect('/');
+}; 
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
