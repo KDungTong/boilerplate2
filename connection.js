@@ -3,7 +3,7 @@ require('dotenv').config();
 const { MongoClient } = require('mongodb');
 
 async function main(callback) {
-    const URI = process.env.MONGO_URI; // Declare MONGO_URI in your .env file
+    const URI = process.env.MONGO_URI; // Sửa lại dòng này
     const client = new MongoClient(URI, { useNewUrlParser: true, useUnifiedTopology: true });
 
     try {
@@ -16,7 +16,7 @@ async function main(callback) {
     } catch (e) {
         // Catch any errors
         console.error(e);
-        throw new Error('Unable to Connect to Database')
+        throw new Error('Unable to Connect to Database');
     }
 }
 
