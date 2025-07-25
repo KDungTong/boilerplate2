@@ -37,10 +37,9 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Middleware bảo vệ route
+
 function ensureAuthenticated(req, res, next) {
-  if (req.isAuthenticated()) {
-    return next();
-  }
+  if (req.isAuthenticated()) return next();
   res.redirect('/');
 }
 
@@ -108,22 +107,19 @@ myDB(async client => {
 
   // Profile
   app.route('/profile')
-    .get(ensureAuthenticated, (req, res) => {
-      res.render('profile', { username: req.user.username });
-    });
+  .get(ensureAuthenticated, (req, res) => {
+    res.render('profile', { username: req.user.username });
+  });
 
   // Logout
-app.route('/logout')
-  .get((req, res, next) => {
-    req.logout(function(err) {
-      if (err) return next(err);
-      req.session.destroy(function(err) {
-        if (err) return next(err);
-        res.clearCookie('connect.sid'); // Quan trọng để xóa cookie
-        res.redirect('/');
-      });
-    });
+  app.get('/logout', (req, res, next) => {
+  req.logout(); // Không có callback trong passport v0.4.1
+  req.session.destroy((err) => {
+    if (err) return next(err);
+    res.clearCookie('connect.sid'); // Optional: Xóa cookie session
+    res.redirect('/');
   });
+});
 
   // 404
   app.use((req, res) => {
