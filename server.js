@@ -36,11 +36,20 @@ app.use(passport.session());
 
   app.route('/login').post(passport.authenticate('local', { failureRedirect: '/' }), (req, res) => {
     res.redirect('/profile');
+     // Store username in session
   })
 
   app.route('/profile').get(ensureAuthenticated, (req,res) => {
     res.render('profile');
+    {username: req.user.username};
   })
+    // Logged a user out
+  app.route('/logout')
+    .get((req, res) => {
+      req.logout();
+      res.redirect('/');
+    });
+    
 
   //Create a new midddleware
   function ensureAuthenticated(req, res, next) {
@@ -100,6 +109,7 @@ function ensureAuthenticated(req, res, next) {
   }
   res.redirect('/');
 }; 
+
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
