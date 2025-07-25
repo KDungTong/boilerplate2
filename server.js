@@ -112,11 +112,14 @@ myDB(async client => {
   });
 
   // Logout
-  app.get('/logout', (req, res, next) => {
-  req.logout(); // Không có callback trong passport v0.4.1
+ app.get('/logout', (req, res) => {
+  req.logout(); // KHÔNG có callback
   req.session.destroy((err) => {
-    if (err) return next(err);
-    res.clearCookie('connect.sid'); // Optional: Xóa cookie session
+    if (err) {
+      console.error(err);
+      return res.redirect('/');
+    }
+    res.clearCookie('connect.sid');
     res.redirect('/');
   });
 });
